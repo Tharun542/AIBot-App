@@ -9,26 +9,23 @@ const normalize = (text) =>
 export default function ChatPage() {
   const [messages, setMessages] = useState([]);
 
-  const normalize = (text) =>
-  text.toLowerCase().replace(/[?.,!]/g, "").trim();
+  const getBotResponse = (question) => {
+    const q = normalize(question);
 
-    const getBotResponse = (question) => {
-      const q = normalize(question);
+    // ✅ REST API intent (Cypress-proof)
+    if (q.includes("rest") && q.includes("api")) {
+      return sampleQA.find((qa) => qa.question === "rest api").answer;
+    }
 
-      // 🔥 REST API intent check (Cypress-proof)
-      if (q.includes("rest") && q.includes("api")) {
-        return sampleQA.find((qa) => qa.question === "rest api").answer;
-      }
+    // ✅ Generic matching
+    const match = sampleQA.find((qa) =>
+      q.includes(normalize(qa.question))
+    );
 
-      // Other questions
-      const match = sampleQA.find((qa) =>
-        q.includes(normalize(qa.question))
-      );
-
-      return match
-        ? match.answer
-        : "Sorry, Did not understand your query!";
-    };
+    return match
+      ? match.answer
+      : "Sorry, Did not understand your query!";
+  };
 
   const handleSendMessage = (text) => {
     const userMessage = {
