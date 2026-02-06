@@ -17,8 +17,9 @@ export default function ChatPage() {
   }, []);
 
   const getBotResponse = (question) => {
+    const normalized = question.trim().toLowerCase();
     const match = sampleQA.find(
-      q => q.question.toLowerCase() === question.toLowerCase()
+      q => q.question.toLowerCase() === normalized
     );
 
     return match

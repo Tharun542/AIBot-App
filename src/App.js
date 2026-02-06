@@ -7,7 +7,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <header>
-        <span>Bot AI</span>
+        <h1>
+          <span>Bot AI</span>
+        </h1>
+        
         <nav>
           <Link to="/">Chat</Link>
           <Link to="/history">Past Conversations</Link>
