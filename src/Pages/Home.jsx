@@ -1,25 +1,19 @@
-import { useEffect, useState } from "react";
-import {sampleQA} from "../Data/SampleData"
+import { useState } from "react";
+import { sampleQA } from "../Data/SampleData";
 import ChatInput from "../Components/ChatInput";
 import MessageBubble from "../Components/MessageBubble";
+
+const normalize = (text) =>
+  text.toLowerCase().replace(/[?.,!]/g, "").trim();
 
 export default function ChatPage() {
   const [messages, setMessages] = useState([]);
 
-  // Load persisted conversations (latest only)
-  useEffect(() => {
-    const saved = JSON.parse(
-      localStorage.getItem("pastConversations")
-    );
-    if (saved && saved.length > 0) {
-      setMessages([]);
-    }
-  }, []);
-
   const getBotResponse = (question) => {
-    const normalized = question.trim().toLowerCase();
-    const match = sampleQA.find(
-      q => q.question.toLowerCase() === normalized
+    const normalizedQuestion = normalize(question);
+
+    const match = sampleQA.find((qa) =>
+      normalizedQuestion.includes(normalize(qa.question))
     );
 
     return match
@@ -37,11 +31,10 @@ export default function ChatPage() {
     const aiMessage = {
       id: Date.now() + 1,
       role: "ai",
-      text: getBotResponse(text),
-      feedback: null
+      text: getBotResponse(text)
     };
 
-    setMessages(prev => [...prev, userMessage, aiMessage]);
+    setMessages((prev) => [...prev, userMessage, aiMessage]);
   };
 
   const saveConversation = () => {
@@ -63,18 +56,8 @@ export default function ChatPage() {
 
   return (
     <div>
-      {messages.map(msg => (
-        <MessageBubble
-          key={msg.id}
-          message={msg}
-          onFeedback={(value) => {
-            setMessages(prev =>
-              prev.map(m =>
-                m.id === msg.id ? { ...m, feedback: value } : m
-              )
-            );
-          }}
-        />
+      {messages.map((msg) => (
+        <MessageBubble key={msg.id} message={msg} />
       ))}
 
       <ChatInput onSend={handleSendMessage} />
