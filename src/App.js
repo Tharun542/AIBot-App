@@ -7,7 +7,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <header>
-        <span>Soul AI</span>
+        <span>Bot AI</span>
         <nav>
           <Link to="/">Chat</Link>
           <Link to="/history">Past Conversations</Link>
