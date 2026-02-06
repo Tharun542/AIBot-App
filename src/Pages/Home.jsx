@@ -1,94 +1,88 @@
-import React, { useState } from "react";
-import { sampleQA } from "../Data/SampleData";
-import EndConversationFeedback from "../Components/EndConvFeedback";
-import MessageBubble from "../Components/MessageBubble";
+import { useEffect, useState } from "react";
+import {sampleQA} from "../Data/SampleData"
 import ChatInput from "../Components/ChatInput";
+import MessageBubble from "../Components/MessageBubble";
 
-export default function Home(){
-      const [message, setMessage] = useState([]);
-      const [feedbackMsg, setFeedbackMsg] = useState(false);
+export default function ChatPage() {
+  const [messages, setMessages] = useState([]);
 
-      const AIResponse =(question)=>{
-          const found = sampleQA.find(q => 
-            q.question.toLowerCase() === question.toLowerCase()
-          )
-          if(found){
-            return found.answer;
-          }else{
-            return "Sorry, Did not understand your query!";
-          }
-      }
-    // user and ai message handle 
-      const handleSendMessage=(text)=>{
-        const userMsg = {
-            id: Date.now(),
-            role: "user",
-            text
-        };
+  // Load persisted conversations (latest only)
+  useEffect(() => {
+    const saved = JSON.parse(
+      localStorage.getItem("pastConversations")
+    );
+    if (saved && saved.length > 0) {
+      setMessages([]);
+    }
+  }, []);
 
-        const aiMsg = {
-            id: Date.now() + 1,
-            role: "ai",
-            text: AIResponse(text),
-            feedback: null
-        };
-        // setmessage assign or store the prev value of message obj, current usermsg and aimsg in message state object.
-        setMessage(prev => [...prev, userMsg, aiMsg]); 
+  const getBotResponse = (question) => {
+    const match = sampleQA.find(
+      q => q.question.toLowerCase() === question.toLowerCase()
+    );
 
-      }
+    return match
+      ? match.answer
+      : "Sorry, Did not understand your query!";
+  };
 
-      const saveConversation=(rating, comment)=>{
-        const save = {
-            id: Date.now(),
-            message,
-            rating,
-            comment
-        };
+  const handleSendMessage = (text) => {
+    const userMessage = {
+      id: Date.now(),
+      role: "user",
+      text
+    };
 
-        const history = JSON.parse(localStorage.getItem("prevConv")) || [];
+    const aiMessage = {
+      id: Date.now() + 1,
+      role: "ai",
+      text: getBotResponse(text),
+      feedback: null
+    };
 
-        localStorage.setItem(
-            "prevConv",
-            JSON.stringify([save, ...history])
-        );
+    setMessages(prev => [...prev, userMessage, aiMessage]);
+  };
 
-        setMessage([]);
-        setFeedbackMsg(false);
-      }
+  const saveConversation = () => {
+    const previous =
+      JSON.parse(localStorage.getItem("pastConversations")) || [];
 
-    return(
-        <div className="chat-page">
-          <div className="chat-window">
-                {message.map(msg => (
-              <MessageBubble
-                key={msg.id}
-                message={msg}
-                onFeedback={(value) => {
-                  setMessage(prev =>
-                    prev.map(m =>
-                      m.id === msg.id ? { ...m, feedback: value } : m
-                    )
-                  );
-                }}
-              />
-            ))}
-          </div>
+    const conversation = {
+      id: Date.now(),
+      messages
+    };
 
-          <ChatInput onSend={handleSendMessage} />
+    localStorage.setItem(
+      "pastConversations",
+      JSON.stringify([conversation, ...previous])
+    );
 
-          {message.length > 0 && (
-            <button
-              type="button"
-              className="end-btn"
-              onClick={() => setFeedbackMsg(true)}
-            >
-              Save Conversation
-            </button>
-          )}
+    setMessages([]);
+  };
 
-          {feedbackMsg && (
-            <EndConversationFeedback onSubmit={saveConversation} />
-          )}        
-        </div>
-    )
+  return (
+    <div>
+      {messages.map(msg => (
+        <MessageBubble
+          key={msg.id}
+          message={msg}
+          onFeedback={(value) => {
+            setMessages(prev =>
+              prev.map(m =>
+                m.id === msg.id ? { ...m, feedback: value } : m
+              )
+            );
+          }}
+        />
+      ))}
+
+      <ChatInput onSend={handleSendMessage} />
+
+      {messages.length > 0 && (
+        <button type="button" onClick={saveConversation}>
+          Save
+        </button>
+      )}
+    </div>
+  );
 }

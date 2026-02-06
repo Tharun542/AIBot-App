@@ -5,7 +5,6 @@ export default function ChatInput({ onSend }) {
 
   return (
     <form
-      className="chat-input"
       onSubmit={(e) => {
         e.preventDefault();
         onSend(input);
@@ -13,7 +12,7 @@ export default function ChatInput({ onSend }) {
       }}
     >
       <input
-        placeholder="Message Bot AI…"
+        placeholder="Message Bot AI..."
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />

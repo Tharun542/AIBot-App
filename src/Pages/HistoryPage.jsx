@@ -1,18 +1,16 @@
 export default function HistoryPage() {
-  const history = JSON.parse(localStorage.getItem("conversations")) || [];
+  const conversations =
+    JSON.parse(localStorage.getItem("pastConversations")) || [];
 
   return (
-    <div className="history-page">
+    <div>
       <h2>Past Conversations</h2>
 
-      {history.map(conv => (
-        <div key={conv.id} className="history-card">
-          <p>Rating: {conv.rating} ⭐</p>
-          <p>{conv.comment}</p>
-
-          {conv.messages.map((m, i) => (
-            <p key={i}>
-              <strong>{m.role}:</strong> {m.text}
+      {conversations.map(conv => (
+        <div key={conv.id}>
+          {conv.messages.map((msg, index) => (
+            <p key={index}>
+              <strong>{msg.role}:</strong> {msg.text}
             </p>
           ))}
         </div>

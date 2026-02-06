@@ -5,7 +5,7 @@ export default function MessageBubble({ message, onFeedback }) {
       <p>{message.text}</p>
 
       {message.role === "ai" && (
-        <div className="hover-feedback">
+        <div className="hover-icons">
           <button onClick={() => onFeedback("like")}>👍</button>
           <button onClick={() => onFeedback("dislike")}>👎</button>
         </div>
